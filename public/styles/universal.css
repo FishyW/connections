@@ -1,0 +1,105 @@
+:root {
+    --accent:#282D3F;
+    --background: #161922;
+    --primary:   #282d3f;
+    --secondary: #5d657a;
+    --text: #BCBDD0;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    color: var(--text);
+}
+
+
+
+html, body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    font-size: 12px;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background);
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(30px);
+    mix-blend-mode: screen;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: url('../assets/grain.jpg');
+    opacity: 0.05;
+    z-index: 1;
+}
+
+.circle {
+    z-index: 0;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button {
+    height: 40px; 
+    border-radius: 20px; 
+    background-color: var(--secondary); 
+    border: 0px; 
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
+
+.button:hover {
+    cursor:pointer;
+    opacity: 0.8;
+}
+
+input {
+    background-color: var(--background);
+    color: #8F8F8F;
+    border: 0px;
+    border-radius: 5px;
+    height: 30px;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0px;
+}
+
+input:focus {
+    outline: none;
+}
+
+.box {
+    width: 500px;
+    height: 300px;
+    background-color: var(--primary);
+    padding: 40px 95px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    isolation: isolate;
+  }
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+}

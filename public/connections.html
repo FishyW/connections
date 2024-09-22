@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neptune</title>    
+    <link rel="stylesheet" href="styles/universal.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script type="module" src="scripts/graph.js"></script>
+  </head>
+  <body>
+
+        
+        
+    <div class="main">
+      
+        
+
+
+        <div class="picker">
+            <div class="option selected" id="connections-tab">Connections</div>
+            <a href="/chat" style="font-weight: normal"><span class="option" id="chat-tab">Chat</span></a>
+        </div>
+        
+        <div id="connections-view" class="view active" style="isolation: isolate">
+            <!-- Connections content goes here -->
+        </div>
+
+        <div id="profile-info"  style="padding: 30px; width: 320px; height: 250px; background-color: var(--primary); border-radius: 10px; display: flex; flex-direction: column; align-items: center; position: fixed; top: 25%; left: 30px;">
+            <img id="picture-info" src="https://xsgames.co/randomusers/assets/avatars/male/48.jpg" width="75" height="75" style="border-radius: 50%; " />
+            <p id="name-info" style="text-align: center; font-size: 1.5rem; margin: 5px">Sam</p>
+            
+            <div style="display: flex; gap: 5px; height: 200px; width: 80%; flex-wrap: wrap;">
+                <div class="interest-info" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+                <div class="interest-info" style="height:fit-content; flex: auto; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+                <div class="interest-info" style="height:fit-content; width:48%;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+                <div class="interest-info" style="height:fit-content; flex: auto;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+        </div>
+        
+        <!-- <div id="chat-view" class="view">
+            <h2 style="color: white;">Chat View</h2>
+        </div> -->
+    </div>
+    <!-- <div id="profile-info">
+        <p id="name-info"></p>
+        <p id="email-info"></p>
+        <p id="interests-info"></p>
+        <p id="friends-info"></p>
+    </div> -->
+    
+    <div class="top-five">
+        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+            <img src="assets/profiles/Person14.jpeg" alt="Image 1" style="border-radius: 50%; width: 30px; height: 30px;">
+            <p style="height: fit-content">N/A</p>
+        </div>   
+        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+            <img src="assets/profiles/Person4.jpeg" alt="Image 2" style="border-radius: 50%; width: 30px; height: 30px;">
+            <p style="height: fit-content">N/A</p>
+        </div>
+        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+            <img src="assets/profiles/Person11.jpeg" alt="Image 3" style="border-radius: 50%; width: 30px; height: 30px;">
+            <p style="height: fit-content">N/A</p>
+        </div>
+        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+            <img src="assets/profiles/Person7.jpeg" alt="Image 4" style="border-radius: 50%; width: 30px; height: 30px;">
+            <p style="height: fit-content">N/A</p>
+        </div>
+        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+            <img src="assets/profiles/Person1.jpeg" alt="Image 5" style="border-radius: 50%; width: 30px; height: 30px;">
+            <p style="height: fit-content">N/A</p>
+        </div>
+    </div>    
+    
+  <script type="module">
+    import { graphInit } from "./scripts/graph.js";
+    import { recommendation } from "./scripts/fire.js";
+    (async () => {
+        // const recommendationData = [["a","A"],["b","B"],["c","C"],["d","D"],["e","E"]]
+        const recommendationData = await recommendation("amelia.johnson@gmail.com");
+        console.log(recommendationData);
+        const recommendationTexts = document.querySelectorAll(".option-five p");
+
+        let max = recommendationData.length;
+        if (recommendationTexts.length <= recommendationData.length){
+            max = recommendationTexts.length;
+        }
+        
+        for (let i = 0; i < max; i++){
+            recommendationTexts[i].innerHTML = recommendationData[i][0];
+            recommendationTexts[i].offsetHeight;
+        }
+        await graphInit(recommendationData);
+    })();
+  </script>
+  </body>
+</html>

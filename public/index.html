@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Neptune</title>
+    <title>Neptune - Login</title>
+    <link rel="stylesheet" href="styles/universal.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="
+    https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js
+    "></script>
+  </head>
+  <body>
+
+  <div class="container" >
+    <div class="box">
+      <p style="text-align: center; font-size: 1.5rem"><b>Neptune</b></p>
+      <p style="text-align: center; padding-bottom: 5px">Let's get back to the conversation</p>
+      <input type="text" id="email" placeholder="Email"/>
+      <input type="password" id="password" placeholder="Password"/>
+      <div style="height: 100%; display: flex;  flex-direction: column;justify-content: flex-end;">
+        <button class="button" id="button">Login</button>
+        <p style="margin-top: 5px;">Don't have an account? <a href="/signup">Create Account</a></p>
+      </div>
+      
+    </div>
+  </div>
+
+ 
+  
+  <script type="module">
+    
+    import { login, returnUser } from "./scripts/fire.js";
+
+    document.querySelector("#button")
+      .addEventListener("click", async () => {
+        const email = document.querySelector("#email").value;
+        const user = await returnUser(email)
+        if (user === undefined) {
+          alert("Invalid email");
+          return;
+        }
+        const password = document.querySelector("#password").value;
+        if (user[1].password != password) {
+          alert("Invalid password");
+          return;
+        }
+
+        Cookies.set("email", email);
+        window.location.href = "/connections";
+
+    });
+
+    (async () => {
+        console.log("hello");
+        // await login();
+    })();
+  </script>
+  </body>
+  
+</html>
