@@ -1,5 +1,5 @@
-# Neptune
-An application that allows users to view their connectivity graph.
+# Connections
+An application that allows users to view their connectivity graph. This was originally a hackathon project called "Neptune".
 
 ## Installation
 
