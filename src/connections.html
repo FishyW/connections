@@ -9,47 +9,34 @@
     <script src="https://d3js.org/d3.v6.js"></script>
     <script type="module" src="scripts/graph.js"></script>
   </head>
-  <body>
-
-        
-        
-    <div class="main">
-      
+  <body>      
         
 
-
-        <div class="picker">
-            <div class="option selected" id="connections-tab">Connections</div>
-            <a href="/chat" style="font-weight: normal"><span class="option" id="chat-tab">Chat</span></a>
-        </div>
-        
-        <div id="connections-view" class="view active" style="isolation: isolate">
-            <!-- Connections content goes here -->
-        </div>
-
-        <div id="profile-info"  style="padding: 30px; width: 320px; height: 250px; background-color: var(--primary); border-radius: 10px; display: flex; flex-direction: column; align-items: center; position: fixed; top: 25%; left: 30px;">
-            <img id="picture-info" src="https://xsgames.co/randomusers/assets/avatars/male/48.jpg" width="75" height="75" style="border-radius: 50%; " />
-            <p id="name-info" style="text-align: center; font-size: 1.5rem; margin: 5px">Sam</p>
-            
-            <div style="display: flex; gap: 5px; height: 200px; width: 80%; flex-wrap: wrap;">
-                <div class="interest-info" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-                <div class="interest-info" style="height:fit-content; flex: auto; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-                <div class="interest-info" style="height:fit-content; width:48%;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-                <div class="interest-info" style="height:fit-content; flex: auto;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-        </div>
-        
-        <!-- <div id="chat-view" class="view">
-            <h2 style="color: white;">Chat View</h2>
-        </div> -->
+    <div class="flex fixed top-5  bg-blue rounded-full p-1">
+        <div class=" rounded-full px-4 py-2 select-none" id="connections-tab">Connections</div>
+        <div class=" rounded-full px-4 py-2"><a href="/chat" class="font-normal"><span id="chat-tab">Chat</span></a></div>
     </div>
-    <!-- <div id="profile-info">
-        <p id="name-info"></p>
-        <p id="email-info"></p>
-        <p id="interests-info"></p>
-        <p id="friends-info"></p>
-    </div> -->
     
-    <div class="top-five">
+    <div id="connections-view" class="view active" style="isolation: isolate">
+        <!-- Connections content goes here -->
+    </div>
+
+    <div class="text-red-50">MM</div>
+
+    <div id="profile-info"  style="padding: 30px; width: 320px; height: 250px; background-color: var(--primary); border-radius: 10px; display: flex; flex-direction: column; align-items: center; position: fixed; top: 25%; left: 30px;">
+        <img id="picture-info" src="https://xsgames.co/randomusers/assets/avatars/male/48.jpg" width="75" height="75" style="border-radius: 50%; " />
+        <p id="name-info" style="text-align: center; font-size: 1.5rem; margin: 5px">Sam</p>
+        
+        <div style="display: flex; gap: 5px; height: 200px; width: 80%; flex-wrap: wrap;">
+            <div class="interest-info" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+            <div class="interest-info" style="height:fit-content; flex: auto; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+            <div class="interest-info" style="height:fit-content; width:48%;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+            <div class="interest-info" style="height:fit-content; flex: auto;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+    </div>
+        
+      
+    
+    <!-- <div class="top-five">
         <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person14.jpeg" alt="Image 1" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
@@ -71,7 +58,7 @@
             <p style="height: fit-content">N/A</p>
         </div>
     </div>    
-    
+     -->
   <script type="module">
     import { graphInit } from "./scripts/graph.js";
     import { recommendation } from "./scripts/fire.js";

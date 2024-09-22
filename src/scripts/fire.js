@@ -1,16 +1,21 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js';
 
-import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.13/firebase-firestore.js';
 
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDc5S2UA-0RaKswKNfKVbWbtHO8RSF5V9A",
-  authDomain: "neptune-736f4.firebaseapp.com",
-  projectId: "neptune-736f4",
-  storageBucket: "neptune-736f4.appspot.com",
-  messagingSenderId: "416252320821",
-  appId: "1:416252320821:web:8e06dd5fdc6a65ebc5a57c"
+  apiKey: "AIzaSyANQSkCgKoYnyNNoyrvnAbaxx5iflfV5pE",
+  authDomain: "connections-6ef2a.firebaseapp.com",
+  projectId: "connections-6ef2a",
+  storageBucket: "connections-6ef2a.appspot.com",
+  messagingSenderId: "967863821211",
+  appId: "1:967863821211:web:c10d6632a25a5430a8773e",
+  measurementId: "G-5C6F6T8QYV"
 };
-
 
 export const app = initializeApp(firebaseConfig);
 
@@ -116,99 +121,96 @@ function count(user1, user2) {
 // such that degree = 2
 // returns [[end_id, mid_id], [[]]]...] ordered from most to least compatible
 export async function recommendation(userEmail) {
-  const userDb = await getUsers(db);
-    const outAr = []
-    const foundUser = []
+  const outAr = []
+  const user = await returnUser(userEmail);
 
-    // Find user with same userEmail
-    for (const user of userDb) {
-      if (user[0] == userEmail) {
-        foundUser.push(user[0])
-        foundUser.push(user[1])
-        break
+  // Iterate through friends of friends to find users with n shared interests
+  for (let n = 3; n >= 0; n--) {
+    for (const friend of user.friends) {
+      let friend = []
+
+      // Find friend in db
+      for (const user of userDb) {
+        if (user[0] == friendOb.email) {
+          friend.push(user[0])
+          friend.push(user[1])
+        }
       }
-    }
 
+      // Iterate through second gen friends to find common interests
+      for (const friend2Ob of friend[1].friends) {
+        let friend2 = []
 
-    // Iterate through friends of friends to find users with n shared interests
-    for (let n = 3; n >= 0; n--) {
-      for (const friendOb of foundUser[1].friends) {
-        let friend = []
-
-        // Find friend in db
+        //find friend2 in db
         for (const user of userDb) {
-          if (user[0] == friendOb.email) {
-            friend.push(user[0])
-            friend.push(user[1])
+          if (user[0] == friend2Ob.email) {
+            friend2.push(user[0])
+            friend2.push(user[1])
           }
         }
 
-        // Iterate through second gen friends to find common interests
-        for (const friend2Ob of friend[1].friends) {
-          let friend2 = []
-
-          //find friend2 in db
-          for (const user of userDb) {
-            if (user[0] == friend2Ob.email) {
-              friend2.push(user[0])
-              friend2.push(user[1])
+        // If shared interest count is n, add to outAr
+        if((count(foundUser, friend2) == n) && (foundUser[0] != friend2[0])) {
+          
+          // Check if friend2 is already in outAr
+          let dupeCheck = false
+          for (const element of outAr) {
+            if (element[0] == friend2[0]) {
+              dupeCheck = true
             }
           }
 
-          // If shared interest count is n, add to outAr
-          if((count(foundUser, friend2) == n) && (foundUser[0] != friend2[0])) {
-            
-            // Check if friend2 is already in outAr
-            let dupeCheck = false
-            for (const element of outAr) {
-              if (element[0] == friend2[0]) {
-                dupeCheck = true
-              }
-            }
-
-            // Check if friend2 is already a friend of user
-            for (const fri of foundUser[1].friends) {
-              if (friend2[0] == fri.email) {
-                dupeCheck = true
-              }
-            }
-
-            if (dupeCheck == false) {
-              outAr.push([friend2[0], friend[0]])
+          // Check if friend2 is already a friend of user
+          for (const fri of foundUser[1].friends) {
+            if (friend2[0] == fri.email) {
+              dupeCheck = true
             }
           }
 
-          // Check and exit if outAr has hit 5 people
-          if (outAr.length == 5) {
-            return outAr
+          if (dupeCheck == false) {
+            outAr.push([friend2[0], friend[0]])
           }
         }
-        
+
+        // Check and exit if outAr has hit 5 people
+        if (outAr.length == 5) {
+          return outAr
+        }
       }
+      
     }
+  }
     
     return outAr
   }
 
-  // return user based on user email
- export async function returnUser(email) {
-    const userDb = await getUsers(db);
 
-    for (const user of userDb) {
-      if (user[0] == email) {
-        return user
-      }
-    }
+  async function retrieveQuery(q) {
+    const arr = [];
+    const snapshot = await getDocs(q);
+    snapshot.forEach((item) => {
+      arr.push(item.data());
+    })
+    return arr;
   }
 
-// Return profile info in format [picture, name, note, [interests]]
+  // return user based on user email
+  // user can be undefined if email is not found
+ export async function returnUser(emailTarget) {
+    const docsRef = collection(db, "users");
+    const q = query(docsRef, where("email", "==", emailTarget));
+    const [user, ..._rest] = await retrieveQuery(q);
+    return user;
+  }
+
+// // Return profile info in format [picture, name, note, [interests]]
 export async function returnProfile(email) {
   const user = await returnUser(email);
   const outAr = [];
-  outAr.push(user[1].picture)
-  outAr.push(user[1].name)
-  outAr.push(user[1].note)
-  outAr.push(user[1].interests)
+  outAr.push(user.picture)
+  outAr.push(user.name)
+  outAr.push(user.note)
+  outAr.push(user.interests)
 
   return outAr;
 }

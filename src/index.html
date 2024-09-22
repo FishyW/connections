@@ -13,16 +13,19 @@
   <body>
 
   <div class="container" >
+    <form >
     <div class="box">
+      
       <p style="text-align: center; font-size: 1.5rem"><b>Connections</b></p>
       <input type="text" id="email" placeholder="Email"/>
       <input type="password" id="password" placeholder="Password"/>
       <div style="height: 100%; display: flex;  flex-direction: column;justify-content: flex-end;">
-        <button class="button" id="button">Login</button>
+        <input type="submit" class="button" id="button" value="Login">
         <p style="margin-top: 5px;">Don't have an account? <a href="/signup">Create Account</a></p>
       </div>
-      
+    
     </div>
+    </form>
   </div>
 
  
@@ -31,16 +34,17 @@
     
     import { login, returnUser } from "./scripts/fire.js";
 
-    document.querySelector("#button")
-      .addEventListener("click", async () => {
+    document.querySelector("form")
+      .addEventListener("submit", async event => {
+        event.preventDefault();
         const email = document.querySelector("#email").value;
-        const user = await returnUser(email)
+        const user = await returnUser(email);
         if (user === undefined) {
           alert("Invalid email");
           return;
         }
         const password = document.querySelector("#password").value;
-        if (user[1].password != password) {
+        if (user.password != password) {
           alert("Invalid password");
           return;
         }
@@ -50,10 +54,6 @@
 
     });
 
-    (async () => {
-        console.log("hello");
-        // await login();
-    })();
   </script>
   </body>
   
