@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js';
+import { getFirestore, collection, getDocs, query, where, getDoc } from 'https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js';
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -45,59 +45,36 @@ async function getUsers(db) {
 
 // return the connection graph
 // returns {"nodes": [{id: <id>, "name": <name>, "interests": <interest>}], "links": [{"source": <id1>, "target": <id2>}]}
-export async function convertToGraph(userEmail) {
-  const userDb = await getUsers(db);
+export async function convertToGraph(user) {
+  
   const outOb = {nodes: [], links: []};
-  let foundUser = null;
-
-  // Find user with same userEmail
-  for (const user of userDb) {
-      if (user[0] === userEmail) {
-          foundUser = { id: user[0], data: user[1] };
-          break;
-      }
-  }
-
-  // If user is not found, return an empty graph
-  if (!foundUser) {
-      return outOb;
-  }
 
   // Add the found user to nodes
   outOb.nodes.push({
-      id: foundUser.id,
-      name: foundUser.data.name,
-      interests: foundUser.data.interests
+      id: user.email,
+      name: user.name,
+      interests: user.interests,
+      object: user
   });
 
   // Iterate through the friends list if it exists
-  if (Array.isArray(foundUser.data.friends)) {
-      for (const friend of foundUser.data.friends) {
-          let friendData = null;
+  for (const friendDoc of user.friends) {
+      const friend = await convertToFriendObject(friendDoc);
 
-          // Find friend in the database
-          for (const user of userDb) {
-              if (user[0] === friend.email) {
-                  friendData = { id: user[0], data: user[1] };
-                  break;
-              }
-          }
+    // If the friend was found, add to nodes and create a link
+      outOb.nodes.push({
+          id: friend.email,
+          name: friend.name,
+          interests: friend.interests,
+          object: friend
+      });
 
-          // If the friend was found, add to nodes and create a link
-          if (friendData) {
-              outOb.nodes.push({
-                  id: friendData.id,
-                  name: friendData.data.name,
-                  interests: friendData.data.interests
-              });
-
-              outOb.links.push({
-                  source: foundUser.id,
-                  target: friendData.id
-              });
-          }
-      }
+      outOb.links.push({
+          source: user.email,
+          target: friend.email
+      });
   }
+
 
   return outOb;
 }
@@ -106,8 +83,8 @@ export async function convertToGraph(userEmail) {
 function count(user1, user2) {
   let count = 0;
 
-  for (const interest1 of user1[1].interests) {
-    for (const interest2 of user2[1].interests) {
+  for (const interest1 of user1.interests) {
+    for (const interest2 of user2.interests) {
       if (interest1 == interest2) {
         count++;
       }
@@ -116,72 +93,36 @@ function count(user1, user2) {
   return count;
 }
 
+export async function convertToFriendObject(friend) {
+  return (await getDoc(friend)).data()
+}
+
 // recommendation system
 // return top 5 candidates with interests similar to user
 // such that degree = 2
 // returns [[end_id, mid_id], [[]]]...] ordered from most to least compatible
-export async function recommendation(userEmail) {
-  const outAr = []
-  const user = await returnUser(userEmail);
+export async function recommendation(user) {
+    let candidatesMap = new Map();
+    for (const friendDoc of user.friends) {
+      const friend = await convertToFriendObject(friendDoc);
+      const friend2Docs = friend.friends;
 
-  // Iterate through friends of friends to find users with n shared interests
-  for (let n = 3; n >= 0; n--) {
-    for (const friend of user.friends) {
-      let friend = []
+      const friend2 = await Promise.all(friend2Docs
+        .map(async friend => (await convertToFriendObject(friend))));
 
-      // Find friend in db
-      for (const user of userDb) {
-        if (user[0] == friendOb.email) {
-          friend.push(user[0])
-          friend.push(user[1])
+      for (const friend of friend2) {
+        if (friend.email == user.email) {
+          continue;
         }
+        candidatesMap.set(friend.email, friend);
       }
-
-      // Iterate through second gen friends to find common interests
-      for (const friend2Ob of friend[1].friends) {
-        let friend2 = []
-
-        //find friend2 in db
-        for (const user of userDb) {
-          if (user[0] == friend2Ob.email) {
-            friend2.push(user[0])
-            friend2.push(user[1])
-          }
-        }
-
-        // If shared interest count is n, add to outAr
-        if((count(foundUser, friend2) == n) && (foundUser[0] != friend2[0])) {
-          
-          // Check if friend2 is already in outAr
-          let dupeCheck = false
-          for (const element of outAr) {
-            if (element[0] == friend2[0]) {
-              dupeCheck = true
-            }
-          }
-
-          // Check if friend2 is already a friend of user
-          for (const fri of foundUser[1].friends) {
-            if (friend2[0] == fri.email) {
-              dupeCheck = true
-            }
-          }
-
-          if (dupeCheck == false) {
-            outAr.push([friend2[0], friend[0]])
-          }
-        }
-
-        // Check and exit if outAr has hit 5 people
-        if (outAr.length == 5) {
-          return outAr
-        }
-      }
-      
     }
-  }
-    
-    return outAr
+    const candidates = [...candidatesMap.values()];
+    const sorted = candidates.sort((a,b) => 
+      count(user, b) - count(user, a) 
+    );
+
+    return sorted
   }
 
 

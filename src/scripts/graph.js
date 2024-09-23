@@ -101,7 +101,7 @@ async function createOrUpdateNodes(svg, nodesData, linksData, simulation, recomm
   
     nodes.enter()
         .append("image")
-        .attr("href", imagePaths[0])
+        .attr("href", d => d.object.imagePath)
         .attr("height", 20)
         .attr("width", 20)
         .attr("mask", (d, i) => `url(#myMask${i})`)
@@ -135,15 +135,16 @@ async function createOrUpdateNodes(svg, nodesData, linksData, simulation, recomm
 
     nodes.exit().remove();
 
-    function handleMouseRightClick(event, d){
-        event.preventDefault();
+
+    function selectUser(d) {
         const profileInfo = document.querySelector("#profile-info");
         const nameInfo = profileInfo.querySelector("#name-info");
         const picInfo = profileInfo.querySelector("#picture-info");
         const interestsInfo = profileInfo.querySelectorAll(".interest-info"); // Correct selector
 
         nameInfo.innerHTML = d.name;
-        picInfo.src =  d.imagePath;
+        picInfo.src =  d.object.imagePath;
+        profileInfo.style.display = "flex";
 
         for (let i = 0; i < 4; i++){
             if (d.interests[i]) {
@@ -153,14 +154,22 @@ async function createOrUpdateNodes(svg, nodesData, linksData, simulation, recomm
             }
         }
     }
+    function handleMouseRightClick(event, d){
+        event.preventDefault();
+        selectUser(d);
+    }
 
     async function handleMouseClick(event, d) {
+        selectUser(d);
+
         for (let expandedNodeId of expanded){
             if (d.id === expandedNodeId){
                 return;
             }   
         }
-        const currNodeGraphData = await convertToGraph(d.id);
+
+        console.log(d);
+        const currNodeGraphData = await convertToGraph(d.object);
         expanded.push(d.id);
         modifyNode(d.id);
         for (let currNodeGraphDataNode of currNodeGraphData.nodes){
@@ -247,6 +256,7 @@ function addNode(svg, newNodeData, nodesData, linksData, simulation, recommendat
         "name": newNodeData.name, 
         "friends": newNodeData.friends, 
         "interests": newNodeData.interests,
+        "object": newNodeData.object,
         "x": centerX,  // Set initial x position
         "y": centerY   // Set initial y position
     });
@@ -285,10 +295,9 @@ function checkRecommendations(recommendationData, svg, initId, linkData, nodeDat
     }
 }
 
-export async function graphInit(recommendationData){
-    const initId = "amelia.johnson@gmail.com";
-    const data = await convertToGraph(initId);
-    expanded.push(initId);
+export async function graphInit(user, recommendationData){
+    const data = await convertToGraph(user);
+    expanded.push(user.email);
 
     mapLinksToNodes(data.nodes, data.links); // Map string IDs to node references
 
@@ -303,10 +312,10 @@ export async function graphInit(recommendationData){
     const defs = svg.append("defs");
 
     createOrUpdateLinks(svg, data.links, simulation, false);
-    await createOrUpdateNodes(svg, data.nodes, data.links, simulation, recommendationData, initId, defs);
-    checkRecommendations(recommendationData, svg, initId, data.links, data.nodes, simulation);
+    await createOrUpdateNodes(svg, data.nodes, data.links, simulation, recommendationData, user.email, defs);
+    checkRecommendations(recommendationData, svg, user.email, data.links, data.nodes, simulation);
 
-    modifyNode(initId);
+    modifyNode(user.email);
 
 
     /*

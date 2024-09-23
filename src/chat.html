@@ -10,11 +10,22 @@
 </head>
   
     <body >
-   
+        <style>
+            .selected {
+                background-color: var(--background);
+            }
+            
+            .unselected:hover {
+                background-color: var(--background);
+                cursor: pointer;
+            }
+    
+        </style>
 
-    <div class="flex fixed top-5  bg-primary rounded-full p-1">
-        <div class=" rounded-full px-4 py-2 select-none" id="connections-tab"><a href="/connections" class="font-normal"><span id="chat-tab">Connections</span></a></div>
-        <div class="bg-background rounded-full px-4 py-2">Chat</div>
+
+    <div class="flex fixed top-5  bg-accent rounded-full text-xl p-1">
+        <a href="/connections" class="font-normal"> <div class=" rounded-full px-6 py-3 select-none" id="connections-tab"><span id="chat-tab">Connections</span></div></a>
+        <div class="bg-background rounded-full px-6 py-3">Chat</div>
     </div>
 
     <div style="display: flex; width: 100vw; height: 100vh; flex-direction: column;">
@@ -28,11 +39,11 @@
                 <div style="background-color: var(--primary); width: 100%; height: 70%; border-radius: 10px;display: flex; flex-direction: column; padding:30px; overflow: auto;">
                     <div data-email="hello" class="selected friend-box" id="friend-selected-template" style="display: none; align-items: center; padding: 7px; border-radius: 20px; margin-bottom: 7px">
                         <img src="https://firebasestorage.googleapis.com/v0/b/sermo-74f7f.appspot.com/o/Person1.jpeg?alt=media&token=529b785d-11a6-4baa-b55b-71f4a7902d57" width="30" height="30" style="margin-right: 10px; border-radius: 50%;"/>
-                        <p style="width: fit-content;font-size: 1.5rem; font-weight: bold;"  class="friend-select-name">Name</p>
+                        <p style="width: fit-content;font-size: 1.25rem; font-weight: bold;"  class="friend-select-name">Name</p>
                     </div>
                     <div data-email="hello" class="unselected friend-box" id="friend-unselected-template" style="display: none; align-items: center; padding: 7px; border-radius: 20px;margin-bottom: 7px">
                         <img src="https://firebasestorage.googleapis.com/v0/b/sermo-74f7f.appspot.com/o/Person1.jpeg?alt=media&token=529b785d-11a6-4baa-b55b-71f4a7902d57" width="30" height="30" style="margin-right: 10px; border-radius: 50%;"/>
-                        <p style="width: fit-content;font-size: 1.5rem; font-weight: bold;"  class="friend-select-name">Name</p>
+                        <p style="width: fit-content;font-size: 1.25rem; font-weight: bold;"  class="friend-select-name">Name</p>
                     </div>
                   
                 </div>
@@ -46,8 +57,8 @@
                                 <img style="border-radius: 50%;" src="https://firebasestorage.googleapis.com/v0/b/sermo-74f7f.appspot.com/o/Person1.jpeg?alt=media&token=529b785d-11a6-4baa-b55b-71f4a7902d57" width="30" height="30"/>
                             </div>
                             <div style="display: flex; flex-direction: column; padding-left: 10px; padding-right: 10px;">
-                                <p style="font-size: 1.5rem;"><b class="message-box-name">Name</b></p>
-                                <p style="font-size: 1.25rem;" class="message-box-text">My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.</p>
+                                <p style="font-size: 1.25rem;"><b class="message-box-name">Name</b></p>
+                                <p style="font-size: 1.1rem;" class="message-box-text">My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.My name is Lucy.</p>
                             </div>
                         </div>
                       
@@ -66,7 +77,7 @@
     <script type="module">
         import { initChat } from "./scripts/chat.js";
 
-        import { returnUser } from "./scripts/fire.js";
+        import { returnUser, convertToFriendObject } from "./scripts/fire.js";
 
         async function populateFriends() {
             let selected = document.querySelector("#friend-selected-template");
@@ -80,18 +91,19 @@
             selected.id = "friend-selected";
             unselected.id = "";
 
-            const [_, {friends}] = await returnUser(Cookies.get("email"));
-            for (const [idx, friend] of friends.entries()) {
+            const user = await returnUser(Cookies.get("email"));
+            for (const [idx, friendDoc] of user.friends.entries()) {
+                const friend = await convertToFriendObject(friendDoc);
                 let node;
                 if (idx == 0) {
                     node = selected.cloneNode(true);
                 } else {
                     node = unselected.cloneNode(true);
                 }
-                const [email, {name, picture}] = await returnUser(friend.email);
-                node.querySelector("img").src = picture;
-                node.querySelector(".friend-select-name").innerText = name;
-                node.dataset.email = email;
+                
+                node.querySelector("img").src = friend.imagePath;
+                node.querySelector(".friend-select-name").innerText = friend.name;
+                node.dataset.email = friend.email;
                 parent.appendChild(node);
             }
         }
@@ -148,61 +160,6 @@
                     const ownEmail = Cookies.get("email");
                     const corEmail = this.dataset.email;
                     clearMessages();
-                    if (corEmail == "sophia.jameson@outlook.com") {
-                        loadMessages([
-                        {
-                            sender: "Sophia",
-                            message: "Hey Amelia! How have you been?",
-                            picture: "assets/profiles/Person6.jpeg"
-                        },
-                        {
-                            sender: "Amelia",
-                            message: "Hi Sophia! I’m doing well, thanks. Just catching up on some work. How about you?",
-                            picture: "assets/profiles/Person1.jpeg"
-                        },
-                        {
-                            sender: "Sophia",
-                            message: "I’m good, just finished a big project at work. I’m looking forward to the weekend. Got any plans?",
-                            picture: "assets/profiles/Person6.jpeg"
-                        },
-                        {
-                            sender: "Amelia",
-                            message: "That sounds exciting! I’m planning to visit a new café in town and maybe go for a walk in the park. What about you?",
-                            picture: "assets/profiles/Person1.jpeg"
-                        },
-                        {
-                            sender: "Sophia",
-                            message: "That sounds lovely! I’m thinking of having a movie marathon at home and maybe bake some cookies. Simple but cozy!",
-                            picture: "assets/profiles/Person6.jpeg"
-                        },
-                        {
-                            sender: "Amelia",
-                            message: "Nice! Any movie recommendations? I’m always looking for something new to watch.",
-                            picture: "assets/profiles/Person1.jpeg"
-                        },
-                        {
-                            sender: "Sophia",
-                            message: "Sure! If you haven't seen it yet, 'The Grand Budapest Hotel' is fantastic. It’s quirky and visually stunning.",
-                            picture: "assets/profiles/Person6.jpeg"
-                        },
-                        {
-                            sender: "Amelia",
-                            message: "I’ve heard good things about that one! I’ll definitely check it out. Thanks for the tip!",
-                            picture: "assets/profiles/Person1.jpeg"
-                        },
-                        {
-                            sender: "Sophia",
-                            message: "You’re welcome! Let me know what you think. Have a great weekend!",
-                            picture: "assets/profiles/Person6.jpeg"
-                        },
-                        {
-                            sender: "Amelia",
-                            message: "Will do! Enjoy your movie marathon and cookies. Talk to you soon!",
-                            picture: "assets/profiles/Person1.jpeg"
-                        }
-                        ])
-                    }
-
                     const selected = document.querySelector("#friend-selected");
                     selected.classList.remove("selected");
                     selected.classList.add("unselected");
@@ -211,8 +168,7 @@
                     this.classList.remove("unselected");
                     this.classList.add("selected");
                     this.id = "friend-selected";
-
-                })
+                });
             }
         }
 
@@ -222,8 +178,7 @@
                     // to do: send the message
 
                     const user = await returnUser(Cookies.get("email"));
-                    const [_, { name, picture }] = user;
-                    appendMessage({sender: name, picture: picture, message: this.value});
+                    appendMessage({sender: user.name, picture: user.imagePath, message: this.value});
                     this.value = "";
                     
                 }
@@ -235,58 +190,6 @@
             await attachFriendClickListener();
             await attachInputEnterListener();
 
-            loadMessages([
-            {
-                sender: "Olivia",
-                message: "Hey Amelia! How's it going?",
-                picture: "assets/profiles/Person2.jpeg"
-            },
-            {
-                sender: "Amelia",
-                message: "Hi Olivia! I’m doing well, thanks. Just got back from a weekend trip. How about you?",
-                picture: "assets/profiles/Person1.jpeg"
-            },
-            {
-                sender: "Olivia",
-                message: "That sounds amazing! I’ve been pretty busy with work lately. Where did you go?",
-                picture: "assets/profiles/Person2.jpeg"
-            },
-            {
-                sender: "Amelia",
-                message: "I went to the mountains for some hiking and relaxation. It was so refreshing. I’ve missed nature! Do you have any plans for the weekend?",
-                picture: "assets/profiles/Person1.jpeg"
-            },
-            {
-                sender: "Olivia",
-                message: "That sounds lovely. I’m actually thinking of having a low-key weekend, maybe catch up on some reading. Any book recommendations?",
-                picture: "assets/profiles/Person2.jpeg"
-            },
-            {
-                sender: "Amelia",
-                message: "Definitely! I recently read 'The Night Circus' by Erin Morgenstern. It’s magical and captivating. I think you’d enjoy it.",
-                picture: "assets/profiles/Person1.jpeg"
-            },
-            {
-                sender: "Olivia",
-                message: "I’ve heard great things about that one! I’ll add it to my list. Thanks for the suggestion!",
-                picture: "assets/profiles/Person2.jpeg"
-            },
-            {
-                sender: "Amelia",
-                message: "You’re welcome! Let me know what you think once you’ve read it. 😊",
-                picture: "assets/profiles/Person1.jpeg"
-            },
-            {
-                sender: "Olivia",
-                message: "Will do! Have a great day, Amelia.",
-                picture: "assets/profiles/Person2.jpeg"
-            },
-            {
-                sender: "Amelia",
-                message: "You too, Olivia. Talk soon!",
-                picture: "assets/profiles/Person1.jpeg"
-            }
-            ])
         })();
     </script>
   </body>

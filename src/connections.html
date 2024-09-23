@@ -5,66 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Connections</title>    
     <link rel="stylesheet" href="styles/universal.css">
-    <link rel="stylesheet" href="styles/main.css">
     <script src="https://d3js.org/d3.v6.js"></script>
     <script type="module" src="scripts/graph.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
   </head>
-  <body>      
+  <body >      
         
 
-    <div class="flex fixed top-5  bg-blue rounded-full p-1">
-        <div class=" rounded-full px-4 py-2 select-none" id="connections-tab">Connections</div>
-        <div class=" rounded-full px-4 py-2"><a href="/chat" class="font-normal"><span id="chat-tab">Chat</span></a></div>
+    <div class="flex fixed top-5  bg-accent rounded-full text-xl p-1 z-10">
+        <div class=" rounded-full px-6 py-3 select-none bg-background" id="connections-tab">Connections</div>
+        <a href="/chat" class="font-normal"><div class=" rounded-full px-6 py-3"><span id="chat-tab">Chat</span></div></a>
     </div>
     
-    <div id="connections-view" class="view active" style="isolation: isolate">
+    <div id="connections-view" class="block" style="isolation: isolate">
         <!-- Connections content goes here -->
     </div>
 
-    <div class="text-red-50">MM</div>
 
-    <div id="profile-info"  style="padding: 30px; width: 320px; height: 250px; background-color: var(--primary); border-radius: 10px; display: flex; flex-direction: column; align-items: center; position: fixed; top: 25%; left: 30px;">
+    <div id="profile-info"  class="left-32  fixed h-full flex flex-col justify-center" style="display: none">
+        <div class="flex flex-col bg-primary py-8  rounded-3xl items-center">
         <img id="picture-info" src="https://xsgames.co/randomusers/assets/avatars/male/48.jpg" width="75" height="75" style="border-radius: 50%; " />
         <p id="name-info" style="text-align: center; font-size: 1.5rem; margin: 5px">Sam</p>
         
-        <div style="display: flex; gap: 5px; height: 200px; width: 80%; flex-wrap: wrap;">
-            <div class="interest-info" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-            <div class="interest-info" style="height:fit-content; flex: auto; background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-            <div class="interest-info" style="height:fit-content; width:48%;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
-            <div class="interest-info" style="height:fit-content; flex: auto;background-color: var(--accented); padding: 6px; border-radius: 8px">Hello</div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center" class="p-4 gap-1" >
+            <div class="interest-info font-bold" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px; text-align: center">Hello</div>
+            <div class="interest-info font-bold" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px; text-align: center">Hello</div>
+            <div class="interest-info font-bold" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px; text-align: center">Hello</div>
+            <div class="interest-info font-bold" style="height:fit-content;  width:48%; background-color: var(--accented); padding: 6px; border-radius: 8px; text-align: center">Hello</div>
+
+        </div>
+    </div>
     </div>
         
       
     
-    <!-- <div class="top-five">
-        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+    <div class="bottom-5 mb-4 fixed w-full justify-center left-0 gap-1 hidden recommend">
+        <div class="option-five bg-accent px-4 py-2 rounded-full" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person14.jpeg" alt="Image 1" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
         </div>   
-        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+        <div class="option-five bg-accent px-4 py-2 rounded-full" style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person4.jpeg" alt="Image 2" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
         </div>
-        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+        <div class="option-five bg-accent px-4 py-2 rounded-full"  style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person11.jpeg" alt="Image 3" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
         </div>
-        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+        <div class="option-five bg-accent px-4 py-2 rounded-full" style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person7.jpeg" alt="Image 4" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
         </div>
-        <div class="option-five" id="top-five-tab" style="display: flex; align-items: center; gap: 10px">
+        <div class="option-five bg-accent px-4 py-2 rounded-full" style="display: flex; align-items: center; gap: 10px">
             <img src="assets/profiles/Person1.jpeg" alt="Image 5" style="border-radius: 50%; width: 30px; height: 30px;">
             <p style="height: fit-content">N/A</p>
         </div>
-    </div>    
-     -->
+     
+</div>
   <script type="module">
     import { graphInit } from "./scripts/graph.js";
-    import { recommendation } from "./scripts/fire.js";
+    import { recommendation, returnUser } from "./scripts/fire.js";
     (async () => {
-        // const recommendationData = [["a","A"],["b","B"],["c","C"],["d","D"],["e","E"]]
-        const recommendationData = await recommendation("amelia.johnson@gmail.com");
+        const user = await returnUser(Cookies.get("email"));
+
+        const recommendationData = await recommendation(user);
         console.log(recommendationData);
         const recommendationTexts = document.querySelectorAll(".option-five p");
 
@@ -74,10 +78,20 @@
         }
         
         for (let i = 0; i < max; i++){
-            recommendationTexts[i].innerHTML = recommendationData[i][0];
+            recommendationTexts[i].innerHTML = recommendationData[i].name;
             recommendationTexts[i].offsetHeight;
         }
-        await graphInit(recommendationData);
+
+        const recommendImages = document.querySelectorAll(".option-five img");
+        for (let i = 0; i < max; i++){
+            recommendImages[i].src = recommendationData[i].imagePath;
+        }
+        
+
+        const div = document.querySelector(".recommend");
+        div.style.display = "flex";
+        await graphInit(user, recommendationData);
+
     })();
   </script>
   </body>
