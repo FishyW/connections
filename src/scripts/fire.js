@@ -103,15 +103,20 @@ export async function convertToFriendObject(friend) {
 // returns [[end_id, mid_id], [[]]]...] ordered from most to least compatible
 export async function recommendation(user) {
     let candidatesMap = new Map();
-    for (const friendDoc of user.friends) {
-      const friend = await convertToFriendObject(friendDoc);
+    const friends = await Promise.all(user.friends.map(async friendDoc => 
+        await convertToFriendObject(friendDoc)));
+
+    for (const friend of friends) {
       const friend2Docs = friend.friends;
 
-      const friend2 = await Promise.all(friend2Docs
+      const friends2 = await Promise.all(friend2Docs
         .map(async friend => (await convertToFriendObject(friend))));
 
-      for (const friend of friend2) {
+      for (const friend of friends2) {
         if (friend.email == user.email) {
+          continue;
+        }
+        if (friends.find(elem => elem.email == friend.email)) {
           continue;
         }
         candidatesMap.set(friend.email, friend);
